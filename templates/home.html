@@ -1,111 +1,328 @@
-<html>
-<body>
-    <div class="login">
-       <h1>Student Exam Performance Indicator</h1>
-   
-       <form action="{{ url_for('predict_datapoint')}}" method="post">
-        <h1>
-            <legend>Student Exam Performance Prediction</legend>
-        </h1>
-        <div class="mb-3">
-            <label class="form-label">Gender</label>
-            <select class="form-control" name="gender" placeholder="Enter you Gender" required>
-                <option class="placeholder" selected disabled value="">Select your Gender</option>
-                <option value="male">
-                    Male
-                </option>
-                <option value="female">
-                    Female
-                </option>
-            </select>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Predictor</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a clean, modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Using the 'Inter' font family */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom focus animation for form controls - Updated for new theme */
+        .form-control:focus-within {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2), 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Custom placeholder styling for dark inputs */
+        .dark-placeholder::placeholder {
+            color: #9CA3AF; /* gray-400 */
+        }
+
+        /* Staggered animation for result elements */
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        .fade-in-delay-1 { animation-delay: 0.2s; }
+        .fade-in-delay-2 { animation-delay: 0.4s; }
+        .fade-in-delay-3 { animation-delay: 0.6s; }
+        .fade-in-delay-4 { animation-delay: 0.8s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Main container entry animation */
+        .scale-in-center {
+            animation: scaleIn 0.6s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-100 to-blue-200">
+
+    <div class="scale-in-center"> <!-- Wrapper for card and footer -->
+        <div class="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden grid md:grid-cols-2">
+            <!-- Left side: The Form -->
+            <div class="bg-gray-800 p-8 md:p-12">
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Student Performance</h1>
+                <h2 class="text-lg text-gray-300 mb-8">Predict Math Scores</h2>
+
+                <form id="predictionForm" action="{{ url_for('predict_datapoint') }}" method="post" class="space-y-6">
+                    
+                    <!-- Gender -->
+                    <div class="form-control transition-all duration-300 ease-in-out hover:scale-105">
+                        <label for="gender" class="block text-sm font-medium text-gray-300 mb-1">Gender</label>
+                        <select id="gender" name="gender" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg transition" required>
+                            <option class="text-gray-400" selected disabled value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <!-- Race/Ethnicity -->
+                    <div class="form-control transition-all duration-300 ease-in-out hover:scale-105">
+                        <label for="ethnicity" class="block text-sm font-medium text-gray-300 mb-1">Race or Ethnicity</label>
+                        <select id="ethnicity" name="ethnicity" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg transition" required>
+                            <option class="text-gray-400" selected disabled value="">Select Ethnicity</option>
+                            <option value="group A">Group A</option>
+                            <option value="group B">Group B</option>
+                            <option value="group C">Group C</option>
+                            <option value="group D">Group D</option>
+                            <option value="group E">Group E</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Parental Level of Education -->
+                    <div class="form-control transition-all duration-300 ease-in-out hover:scale-105">
+                        <label for="parental_level_of_education" class="block text-sm font-medium text-gray-300 mb-1">Parental Level of Education</label>
+                        <select id="parental_level_of_education" name="parental_level_of_education" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg transition" required>
+                            <option class="text-gray-400" selected disabled value="">Select Parent Education</option>
+                            <option value="associate's degree">Associate's Degree</option>
+                            <option value="bachelor's degree">Bachelor's Degree</option>
+                            <option value="high school">High School</option>
+                            <option value="master's degree">Master's Degree</option>
+                            <option value="some college">Some College</option>
+                            <option value="some high school">Some High School</option>
+                        </select>
+                    </div>
+
+                    <!-- Lunch -->
+                    <div class="form-control transition-all duration-300 ease-in-out hover:scale-105">
+                        <label for="lunch" class="block text-sm font-medium text-gray-300 mb-1">Lunch Type</label>
+                        <select id="lunch" name="lunch" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg transition" required>
+                            <option class="text-gray-400" selected disabled value="">Select Lunch Type</option>
+                            <option value="free/reduced">Free/Reduced</option>
+                            <option value="standard">Standard</option>
+                        </select>
+                    </div>
+
+                    <!-- Test Preparation Course -->
+                    <div class="form-control transition-all duration-300 ease-in-out hover:scale-105">
+                        <label for="test_preparation_course" class="block text-sm font-medium text-gray-300 mb-1">Test Preparation Course</label>
+                        <select id="test_preparation_course" name="test_preparation_course" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg transition" required>
+                            <option class="text-gray-400" selected disabled value="">Select Test Course Status</option>
+                            <option value="none">None</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+
+                    <!-- Scores -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="form-control transition-all duration-300 ease-in-out hover:scale-105">
+                            <label for="reading_score" class="block text-sm font-medium text-gray-300 mb-1">Reading Score (0-100)</label>
+                            <input id="reading_score" type="number" name="reading_score" placeholder="e.g., 85" min="0" max="100" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg transition dark-placeholder" required />
+                        </div>
+                        <div class="form-control transition-all duration-300 ease-in-out hover:scale-105">
+                            <label for="writing_score" class="block text-sm font-medium text-gray-300 mb-1">Writing Score (0-100)</label>
+                            <input id="writing_score" type="number" name="writing_score" placeholder="e.g., 90" min="0" max="100" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg transition dark-placeholder" required />
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                        <button id="clearBtn" type="button" class="w-full sm:w-auto bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                            Clear
+                        </button>
+                        <input class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 cursor-pointer" type="submit" value="Predict Score" />
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Right side: Result Display -->
+            <div class="bg-blue-600 p-8 md:p-12 flex flex-col items-center justify-center">
+                <div class="relative z-10 text-center text-white w-full">
+                    <h3 class="text-2xl font-semibold mb-6">Prediction Result</h3>
+                    
+                    <!-- This section will only display if a result is passed from Flask -->
+                    {% if results %}
+                    <div id="resultsCard" class="bg-white text-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center space-y-4">
+                        <p class="text-lg font-medium opacity-0 fade-in">Predicted Math Score:</p>
+                        <div class="relative w-40 h-40 md:w-48 md:h-48 opacity-0 fade-in fade-in-delay-1">
+                            <canvas id="scoreGauge" width="192" height="192"></canvas>
+                            <div id="gaugeText" class="absolute inset-0 flex items-center justify-center text-6xl font-bold text-gray-800 tracking-tighter">
+                                0
+                            </div>
+                        </div>
+                        <p id="qualitativeFeedback" class="text-xl font-bold opacity-0 fade-in fade-in-delay-2"></p>
+                        
+                        <!-- Recommendations Section -->
+                        <div id="recommendations" class="text-left w-full bg-gray-100 rounded-lg p-4 mt-4 opacity-0 fade-in fade-in-delay-3">
+                            <!-- Content will be injected by JavaScript -->
+                        </div>
+
+                        <a href="{{ url_for('predict_datapoint') }}" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 cursor-pointer inline-block opacity-0 fade-in fade-in-delay-4">
+                            Predict Again
+                        </a>
+                    </div>
+                    {% else %}
+                    <!-- Default message before prediction -->
+                    <div id="placeholderCard" class="bg-white text-gray-800 rounded-xl p-6 shadow-lg flex flex-col items-center space-y-4 fade-in">
+                        <p class="text-lg font-medium">Predicted Math Score:</p>
+                        <div class="relative w-40 h-40 md:w-48 md:h-48 flex items-center justify-center">
+                            <!-- Placeholder SVG for the gauge -->
+                            <svg class="w-full h-full" viewBox="0 0 192 192">
+                                <circle cx="96" cy="96" r="80" stroke="#E5E7EB" stroke-width="16" fill="none" stroke-linecap="round" transform="rotate(-135 96 96)" stroke-dasharray="377" stroke-dashoffset="94.25"></circle>
+                                <text x="96" y="112" font-family="Inter, sans-serif" font-size="60" font-weight="bold" fill="#9CA3AF" text-anchor="middle">?</text>
+                            </svg>
+                        </div>
+                        <p class="text-xl font-bold text-gray-400">Awaiting Input</p>
+                        
+                        <div class="text-center w-full bg-gray-100 rounded-lg p-4 mt-4">
+                            <h4 class="text-md font-bold text-gray-700 mb-1">Ready to Start?</h4>
+                            <p class="text-sm text-gray-600">Fill out the form on the left to see the prediction.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Race or Ethnicity</label>
-            <select class="form-control" name="ethnicity" placeholder="Enter you ethnicity" required>
-                <option class="placeholder" selected disabled value="">Select Ethnicity</option>
-                <option value="group A">
-                    Group A
-                </option>
-                <option value="group B">
-                    Group B
-                </option>
-                <option value="group C">
-                    Group C
-                </option>
-                <option value="group D">
-                    Group D
-                </option>
-                <option value="group E">
-                    Group E
-                </option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Parental Level of Education</label>
-            <select class="form-control" name="parental_level_of_education"
-                placeholder="Enter you Parent Education" required>
-                <option class="placeholder" selected disabled value="">Select Parent Education</option>
-                <option value="associate's degree">
-                    associate's degree
-                </option>
-                <option value="bachelor's degree">
-                    bachelor's degree
-                </option>
-                <option value="high school">
-                    high school
-                </option>
-                <option value="master's degree">
-                    master's degree
-                </option>
-                <option value="some college">
-                    some college
-                </option>
-                <option value="some high school">
-                    some high school
-                </option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Lunch Type</label>
-            <select class="form-control" name="lunch" placeholder="Enter you Lunch" required>
-                <option class="placeholder" selected disabled value="">Select Lunch Type</option>
-                <option value="free/reduced">
-                    free/reduced
-                </option>
-                <option value="standard">
-                    standard
-                </option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Test preparation Course</label>
-            <select class="form-control" name="test_preparation_course" placeholder="Enter you Course"
-                required>
-                <option class="placeholder" selected disabled value="">Select Test_course</option>
-                <option value="none">
-                    None
-                </option>
-                <option value="completed">
-                    Completed
-                </option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Writing Score out of 100</label>
-            <input class="form-control" type="number" name="reading_score"
-                placeholder="Enter your Reading score" min='0' max='100' />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Reading Score out of 100</label>
-            <input class="form-control" type="number" name="writing_score"
-                placeholder="Enter your Reading Score" min='0' max='100' />
-        </div>
-        <div class="mb-3">
-            <input class="btn btn-primary" type="submit" value="Predict your Maths Score" required />
-        </div>
-    </form>
-    <h2>
-       THE  prediction is {{results}}
-    </h2>
-   <body>
+        <footer class="text-center py-6">
+            <p class="text-gray-600 tracking-wide">
+                Made with <span class="text-red-500 text-xl transition-transform duration-300 inline-block align-middle hover:scale-125 animate-pulse">&hearts;</span> by <strong class="font-semibold">HKJOSHI</strong>
+            </p>
+        </footer>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('predictionForm');
+            const clearBtn = document.getElementById('clearBtn');
+
+            if(clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    form.reset();
+                    document.getElementById('gender').focus();
+                });
+            }
+
+            // This script runs only if a result is available
+            {%if results%}
+                const finalScore = Math.round({{ results }});
+                const canvas = document.getElementById('scoreGauge');
+                const ctx = canvas.getContext('2d');
+                const feedbackEl = document.getElementById('qualitativeFeedback');
+                const recommendationsEl = document.getElementById('recommendations');
+                const gaugeTextEl = document.getElementById('gaugeText');
+
+                function getPerformanceData(score) {
+                    if (score >= 90) return { 
+                        text: "Excellent!", 
+                        color: '#22C55E', // green-500
+                        icon: `<svg class="w-6 h-6 mr-3 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                        advice: "Keep up the great work! Challenge yourself with advanced problems or explore related topics."
+                    };
+                    if (score >= 75) return { 
+                        text: "Very Good!", 
+                        color: '#84CC16', // lime-500
+                        icon: `<svg class="w-6 h-6 mr-3 text-lime-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                        advice: "You have a strong foundation. Focus on reviewing tricky concepts to aim for excellence."
+                    };
+                    if (score >= 60) return { 
+                        text: "Good", 
+                        color: '#FBBF24', // amber-400
+                        icon: `<svg class="w-6 h-6 mr-3 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                        advice: "You're on the right track. Identify weaker areas and dedicate extra study time to them."
+                    };
+                    if (score >= 40) return { 
+                        text: "Needs Improvement", 
+                        color: '#F97316', // orange-500
+                        icon: `<svg class="w-6 h-6 mr-3 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`,
+                        advice: "Revisit fundamental concepts and work through practice exercises. Consider forming a study group."
+                    };
+                    return { 
+                        text: "At Risk", 
+                        color: '#DC2626', // red-600
+                        icon: `<svg class="w-6 h-6 mr-3 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>`,
+                        advice: "It's important to seek help. Talk to your teacher or a tutor to create a study plan."
+                    };
+                }
+
+                const performance = getPerformanceData(finalScore);
+                
+                feedbackEl.textContent = performance.text;
+                feedbackEl.style.color = performance.color;
+                
+                recommendationsEl.innerHTML = `
+                    <h4 class="text-md font-bold text-gray-700 mb-2">Recommendations</h4>
+                    <div class="flex items-start">
+                        ${performance.icon}
+                        <p class="text-sm text-gray-600">${performance.advice}</p>
+                    </div>
+                `;
+
+                function drawGauge(score) {
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const radius = 80;
+                    const lineWidth = 16;
+
+                    const startAngle = -0.75 * Math.PI;
+                    const endAngle = startAngle + (score / 100) * 1.5 * Math.PI;
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Background arc
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, startAngle, startAngle + 1.5 * Math.PI);
+                    ctx.lineWidth = lineWidth;
+                    ctx.strokeStyle = '#E5E7EB'; // gray-200
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+
+                    // Foreground arc
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    ctx.lineWidth = lineWidth;
+                    ctx.strokeStyle = performance.color;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
+
+                function animateCountUp(el, to, duration = 1500) {
+                    let startTime = null;
+                    const startValue = 0;
+
+                    function animation(currentTime) {
+                        if (startTime === null) startTime = currentTime;
+                        const elapsedTime = currentTime - startTime;
+                        const progress = Math.min(elapsedTime / duration, 1);
+                        const currentValue = Math.floor(progress * (to - startValue) + startValue);
+                        
+                        el.textContent = currentValue;
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animation);
+                        } else {
+                            el.textContent = to;
+                        }
+                    }
+                    requestAnimationFrame(animation);
+                }
+
+                drawGauge(finalScore);
+                animateCountUp(gaugeTextEl, finalScore);
+            {% endif %}
+        });
+    </script>
+</body>
 </html>
