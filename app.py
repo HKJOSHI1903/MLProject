@@ -41,4 +41,4 @@ def predict_datapoint():
             return render_template('home.html', error=f"Prediction failed: {e}")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0") # Use debug=True for development
+    app.run() # Use debug=True for development
